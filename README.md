@@ -2,13 +2,19 @@
 
 _Make your tests tell a story._
 
+## Why?
+
+We've observed that well-written code and a well-structured API tells a good story. Writing single-purpose functions and improving setup composition improves tests. This thin DSL around ExUnit does exactly that. 
+
 ## Quick Start
 
 To use TrueStory, just add as a dependency and write your tests. 
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
 
-  1. Add `true_story` to your list of dependencies in `mix.exs`:
+### Add Your Dependencies
+
+Add `true_story` to your list of dependencies in `mix.exs`:
 
     ```elixir
     def deps do
@@ -16,7 +22,7 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
     end
     ```
 
-## Writing Tests
+### Write Tests
 
 First, you'll use `ExUnit.Case`, and import `TrueStory`, like this: 
 
@@ -32,9 +38,9 @@ end
 ```
 Next, you'll write your tests. Everything will compose, with each part of a story modifying a map, or context. To keep things brief, it's idiomatic to call the context `c`. 
 
-### Experiments and Measurements
+### Experiments (`story`) and measurements (`verify`)
 
-A TrueStory test has an experiment and measurements. The experiment changes the world, and the measurements evaluate the impact of the experiment. Experiments go in a `story` block and measurements go in a `verify` block. 
+A TrueStory test has an experiment and measurements. The experiment changes the world, and the measurements evaluate the impact of the experiment. Experiments go in a `story` section and measurements go in a `verify` block. 
 
 This story tests adding to a map. In the `story` block, you'll test 
 
@@ -46,6 +52,8 @@ This story tests adding to a map. In the `story` block, you'll test
     refute c.key == :not_value
   end
 ```
+
+That's it. The `story` section has a name and a context pipe. The context pipe is a macro that allows basic piping, but also has some goodies for convenience.
 
 ### Building Your Story
 
@@ -103,6 +111,47 @@ end
 ```
 
 Like the experiment steps, these stories compose, with the previous story piped into the next. 
+
+## Goodies for convenience
+
+The pipe operator in the `story` macro allows you to access any key in the context placed there by an earlier pipe segment. For example, say you had some setup functions: 
+
+```elixir
+
+  defp create_user(c),
+    do: Map.put(c, :user, %User{ name: "Bubba" }
+    
+  defp create_blog(c, user),
+    do: Map.put(c, :blog, %Blog{ name: "Fishin'", user: user }
+  
+  defp create_post(c, blog, options), do: Blog.create(blog, options)
+```
+
+In your story, you can access the context in earlier pipe segments, like this: 
+
+```elixir
+story "Creating a post", c
+  |> create_user
+  |> create_blog(c.user)
+  |> create_post(c.blog, post: post_options), 
+verify do
+  ...
+end
+```
+
+Notice we're free to specify c.user and c.blog, which otherwise would be out of bounds. We can also take advantage of the same behavior in our setup functions with `assigns`, like this: 
+
+```elixir
+
+defp blog_with_post(user, title, post) do
+  assign(
+    user: user, 
+    blog:create_blog(c.user), 
+    post: create_post(c.blog, c.user) )
+end
+```
+That macro makes composing this kind of data much cleaner. 
+
 
 ## Philosophies
 
