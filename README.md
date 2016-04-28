@@ -75,7 +75,7 @@ You can write composable functions that transform a test context to build up you
 
 Most application tests are built in the setup. Piping together setup functions like this, you can build a growing library of setup functions for your application, and save your setup library in a common module. 
 
-### Tests that Span Multiple Experiments
+### Linking Multiple Stories
 
 Maybe we would like to measure intermediate steps. To do so, you can run an integration test across tests, like this: 
 
