@@ -111,3 +111,13 @@ end
 ```
 
 Like the experiment steps, these stories compose, with the previous story piped into the next. 
+
+## Philosophies
+
+- *Tests are first class citizens.* We'll use macros where needed to simplify tasks we do every day, to save repetition and ceremony. 
+- *One experiment, multiple measurements.* That means every piece of test code has a distinct purpose. 
+- *Experiments can be stateful; measurements can't.* This means that we can run each setup *once* so better performance is possible. 
+- *Experiments raise; measurements return fail data.* This means we can return multiple failures per test, shorting cycle times. 
+- *Everything composes.* We find that most testing effort is in setup. If setup is simple, the rest of the testing is much easier. 
+
+Enjoy. Let us know what you think. 
