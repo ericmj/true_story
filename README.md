@@ -12,15 +12,7 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 
     ```elixir
     def deps do
-      [{:true_story, "~> 0.0.1"}]
-    end
-    ```
-
-  2. Ensure `true_story` is started before your application:
-
-    ```elixir
-    def application do
-      [applications: [:true_story]]
+      [{:true_story, "~> 0.0.1", only: :test}]
     end
     ```
 
