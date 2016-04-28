@@ -1,6 +1,6 @@
 # TrueStory
 
-**TODO: Add description**
+_Make your tests tell a story._
 
 ## Installation
 
