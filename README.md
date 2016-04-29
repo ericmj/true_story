@@ -53,6 +53,8 @@ This story tests adding to a map. In the `story` block, you'll test
   end
 ```
 
+Please note: *verify blocks can't be stateful, and they can't mutate the context!* Keeping verify blocks pure allows us to run all verifications for a single test at once. 
+
 That's it. The `story` section has a name and a context pipe. The context pipe is a macro that allows basic piping, but also has some goodies for convenience.
 
 ### Building Your Story
@@ -109,6 +111,7 @@ integrate "adding multiple keys" do
   end
 end
 ```
+This test expands to a single ExUnit test, so there's no concern about compatibility. 
 
 Like the experiment steps, these stories compose, with the previous story piped into the next. 
 
