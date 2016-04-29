@@ -117,6 +117,8 @@ Like the experiment steps, these stories compose, with the previous story piped 
 
 ## Goodies for convenience
 
+### The `story` pipe
+
 The pipe operator in the `story` macro allows you to access any key in the context placed there by an earlier pipe segment. For example, say you had some setup functions: 
 
 ```elixir
@@ -155,6 +157,45 @@ end
 ```
 That macro makes composing this kind of data much cleaner. 
 
+### defplot
+
+Often, you want to add a single key to a test context. To make things easier for the person reading the test, you would like to make the name of the function in the story block and the key in the context the same. `defplot` makes this easy. You can build a single line of a story, called a `plot`, like this: 
+
+```elixir
+defplot user(name, email) do
+  %User{ name: name || "Bubba", email: email || "gone@fishin.example.com" }
+end
+```
+
+Note that you can one-line simpler functions as well: 
+
+```elixir
+defplot user(name, email), do:%User{ name: name, email: email }
+
+```
+
+That expands to: 
+
+```elixir
+
+def user(c, name, email) do
+  Map.put c, :user, %User{ name: name, email: email }
+end
+```
+
+Say you have a story block that looks like this: 
+
+```elixir
+story "Emailing a user", c
+  |> user, 
+  |> application_function_emailing_a_user
+verify do
+  assert c.user.email
+end
+
+```
+
+Now, it's clear that the `user` plot in the story populates the `:user` key in the context. Your stories are easier to read, and your plot lines are easier to write. Win/win.
 
 ## Philosophies
 
