@@ -2,7 +2,7 @@ defmodule TrueStory do
 
   defmacro __using__(_opts) do
     quote do
-      import unquote(__MODULE__), only: [story: 4]
+      import unquote(__MODULE__), only: [story: 4, assign: 2]
       import ExUnit.Assertions, except: [assert: 1, assert: 2, refute: 1, refute: 2]
       import TrueStory.Assertions
     end
@@ -48,10 +48,6 @@ defmodule TrueStory do
 
   defp expand_block([do: block]), do: block
 
-  # def assign(context, assigns) do
-  #   Dict.merge(context, assigns)
-  # end
-
   @doc false
   def setup_pdict do
     Process.put(:true_story_errors, [])
@@ -69,5 +65,23 @@ defmodule TrueStory do
       errors ->
         raise ExUnit.MultiError.exception(errors: errors)
     end
+  end
+
+  defmacro assign(context, assigns) do
+    ast = quote do: context = unquote(context)
+    Enum.reduce(assigns, ast, fn {key, expr}, ast ->
+      expr = Macro.prewalk(expr, &translate_var(&1, context))
+      quote do
+        unquote(ast)
+        context = Map.put(context, unquote(key), unquote(expr))
+      end
+    end)
+  end
+
+  defp translate_var({name, _, context}, {name, _, context}) do
+    quote do: context
+  end
+  defp translate_var(expr, _context) do
+    expr
   end
 end

@@ -12,6 +12,20 @@ defmodule TrueStoryTest do
     refute c.key == :not_value
   end
 
+  test "assign", c do
+    c = assign c, key: :value
+    assert c.key == :value
+
+    _ = assign c, key: :value2
+    refute c.key == :value2
+
+    c = assign c,
+      number1: 1,
+      number2: c.number1+1
+
+    assert c.number2 == 2
+  end
+
   # story "single multi error", c
   #   |> add_to_map(:key, :value),
   # verify do
