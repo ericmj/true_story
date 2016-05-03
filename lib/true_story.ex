@@ -33,7 +33,6 @@ defmodule TrueStory do
   end
 
   defp expand_setup(context_var, pipes) do
-    pipes = Enum.reverse(pipes)
     acc = quote do: unquote(context_var) = context
 
     Enum.reduce(pipes, acc, fn {call, 0}, acc ->
