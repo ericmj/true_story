@@ -16,11 +16,11 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 
 Add `true_story` to your list of dependencies in `mix.exs`:
 
-    ```elixir
-    def deps do
-      [{:true_story, "~> 0.0.1", only: :test}]
-    end
-    ```
+```elixir
+def deps do
+  [{:true_story, "~> 0.0.1", only: :test}]
+end
+```
 
 ### Write Tests
 
