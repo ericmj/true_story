@@ -152,7 +152,7 @@ end
 ```
 That macro makes composing this kind of data much cleaner.
 
-### defplot
+### defplot (coming soon)
 
 Often, you want to add a single key to a test context. To make things easier for the person reading the test, you would like to make the name of the function in the story block and the key in the context the same. `defplot` makes this easy. You can build a single line of a story, called a `plot`, like this:
 
