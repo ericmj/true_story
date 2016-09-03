@@ -2,7 +2,7 @@ defmodule TrueStory do
 
   defmacro __using__(_opts) do
     quote do
-      import unquote(__MODULE__), only: [story: 4, assign: 2]
+      import unquote(__MODULE__), only: [story: 4, assign: 2, integration: 2]
       import ExUnit.Assertions, except: [assert: 1, assert: 2, refute: 1, refute: 2]
       import TrueStory.Assertions
       @true_story_integration false
@@ -10,13 +10,16 @@ defmodule TrueStory do
   end
   
   defmacro integration(name, block) do
+    context_var = quote do 
+      context 
+    end
+    Module.put_attribute __CALLER__.module, :true_story_integration,  true
+    Module.put_attribute __CALLER__.module, :true_story_functions,  []
+    Module.put_attribute __CALLER__.module, :integration_test_name, name
     quote do
-      @true_story_integration true
-      @true_story_functions []
-      @integration_test_name unquote(name)
       unquote block
-      test unqoute(name), context do
-        unquote(build_integration_test(context, __MODULE__))
+      test unquote(name), context do
+        unquote(build_integration_test(context_var, __CALLER__.module))
       end
       @true_story_integration false
     end
@@ -33,19 +36,19 @@ defmodule TrueStory do
 
   defmacro story(name, setup, verify, block) do
     inside_integration_block = Module.get_attribute __CALLER__.module, :true_story_integration
-    _story(inside_integration_block, name, setup, verify, block)
+    _story(inside_integration_block, name, setup, verify, block, __CALLER__.module)
   end
   
-  defp _story(true, name, setup, verify, block) do
+  defp _story(true, name, setup, verify, block, integration_test_module) do
     [{context_var, 0} | pipes] = Macro.unpipe(setup)
     setup = expand_setup(context_var, pipes)
     _verify = expand_verify(verify)
     block = expand_block(block)
-    test_function_name = create_name name
-    
+    test_function_name = create_name name, integration_test_module
+    existing_functions = Module.get_attribute integration_test_module, :true_story_functions
+    Module.put_attribute integration_test_module, :true_story_functions, [test_function_name|existing_functions] 
     quote do
-      @true_story_functions [test_function_name|@true_story_functions] 
-      def unquote(test_function_name), context do
+      def unquote(test_function_name)( context ) do
         try do
           TrueStory.setup_pdict()
           unquote(setup)
@@ -63,7 +66,7 @@ defmodule TrueStory do
     
   end
   
-  defp _story(false, name, setup, verify, block) do
+  defp _story(false, name, setup, verify, block, _) do
     [{context_var, 0} | pipes] = Macro.unpipe(setup)
     setup = expand_setup(context_var, pipes)
     _verify = expand_verify(verify)
@@ -88,8 +91,8 @@ defmodule TrueStory do
   end
   
   # TODO capture pretty error. This fails if there are two integration tests of the same name
-  def create_name(text, integration_name) do 
-    String.to_atom("#{Module.get_attribute(:integration_test_name)} #{text}")
+  def create_name(text, integration_test_module) do 
+    String.to_atom("#{Module.get_attribute(integration_test_module, :integration_test_name)} #{text}")
   end
   
 
