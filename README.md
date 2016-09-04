@@ -4,7 +4,7 @@ _Make your tests tell a story._
 
 ## Why?
 
-We've observed that well-written code and a well-structured API tells a good story. Writing single-purpose functions and improving setup composition improves tests. This thin DSL around ExUnit does exactly that.
+We've observed that well-written code and a well-structured API tells a good story. Writing single-purpose functions and improving setup composition improves tests. When you get the setup right, tests get simpler and the structure is easier to read and easier to follow. This thin DSL around ExUnit does exactly that.
 
 ## Quick Start
 
@@ -140,7 +140,10 @@ verify do
 end
 ```
 
-Notice we're free to specify c.user and c.blog, which otherwise would be out of bounds. We can also take advantage of the same behavior in our setup functions with `assigns`, like this:
+Read the previous code carefully. Typically, the `user` would not be available from the `c` variable. By making it available with a 
+macro, we make it easy to effortlessly build a simple composition of pipe segments, with the changes of each previous segment 
+available to the next. Notice we're free to specify c.user and c.blog, which otherwise would be out of bounds. We can also take 
+advantage of the same behavior in our setup functions with `assigns`, like this:
 
 ```elixir
 defp blog_with_post(user, title, post) do
@@ -189,12 +192,38 @@ end
 
 Now, it's clear that the `user` plot in the story populates the `:user` key in the context. Your stories are easier to read, and your plot lines are easier to write. Win/win.
 
-## Philosophies
+## Expected Use
 
-- *Tests are first class citizens.* We'll use macros where needed to simplify tasks we do every day, to save repetition and ceremony.
-- *One experiment, multiple measurements.* That means every piece of test code has a distinct purpose.
-- *Experiments can be stateful; measurements can't.* This means that we can run each setup *once* so better performance is possible.
+In True Story, We change the way we think about tests a little bit. Follow these rules and you'll get better benefit out of the framework. 
+
+### One experiment, multiple measurements
+
+The `story` block contains an experiment. The `verify` block conains one or more measurements. You probably noticed that we're not afraid of multiple assertions in our `verify` block. We think that's ok, and it fits our metaphor. We're verifying a story, or measuring the result of an experiment. 
+
+### Separation of pure and impure. 
+
+Anything that changes the context or the external world *always* goes into `story`. The `verify` is left to pure functions. That means we'll call our `story` blocks exactly once, and that's a huge win. The processing is simpler, and allows the best possible concurrency. 
+
+### Reusable Library
+
+Over the course of time, you'll accumulate reusable testing units in your story `library`. The way we're structured encourages this practice, and encourages users to build into composeable blocks. It's easy to roll up smaller library functions into bigger ones using nothing but piping and this is encouraged. 
+
+### Experiments raise errors, assertions return data. 
+
+That means we don't have to stop for a failure. Since assertions/measurements are stateless, we don't have to worry about failures corrupting our tests, so these tests can continue to run. We get better cycle times because we can fix multiple tests for a single run while doing green field development or refactoring. 
+
+### Everything should compose. In True Story, an integration test is just one test that flows into the next. Story pipe segments are also just compositions on the context. 
+
+## Wins
+
+We didn't release True Story until we'd had six months of experience with it. We can confirm that these techniques work. Here's what we're finding. 
+
+- *Tests are first class citizens.* The macros in this library are big wins for the organization of setup functions, and thus tests.
+- *One experiment, multiple measurements.* We find single purpose code gives us prettier tests, and more composable, reusable setups. 
+- *Experiments can be stateful; measurements can't.* We can run each setup *once* so we get great performance.
 - *Experiments raise; measurements return fail data.* This means we can return multiple failures per test, shorting cycle times.
 - *Everything composes.* We find that most testing effort is in setup. If setup is simple, the rest of the testing is much easier.
 
 Enjoy. Let us know what you think.
+
+We're looking into better integration with Phoenix, and better integration with genstage. We're open to ideas and pull requests. 
