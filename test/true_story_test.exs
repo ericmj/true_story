@@ -30,13 +30,15 @@ defmodule TrueStoryTest do
     story "adding to a map", c
       |> add_to_map(:key, :value),
     verify do
+      # assert false
       assert c.key == :value
       refute c.key == :not_value
     end
-    
+
     story "adding another key to the map", c
       |> add_to_map(:another_key, :value),
     verify do
+      # assert false
       assert c.key == :value
       assert c.another_key == :value
       refute c.key == :not_value
