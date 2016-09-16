@@ -10,7 +10,7 @@ We've observed that well-written code and a well-structured API tells a good sto
 
 To use TrueStory, just add as a dependency and write your tests.
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
+[Available in Hex](https://hex.pm/packages/true_story), the package can be installed as:
 
 ### Add Your Dependencies
 
