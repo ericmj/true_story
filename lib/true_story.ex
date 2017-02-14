@@ -77,10 +77,9 @@ defmodule TrueStory do
         end
       end
     end
-
   end
 
-  defp _story(_, name, setup, verify, block, _) do
+  defp _story(integrated, name, setup, verify, block, _) when integrated in [nil, false] do
     [{context_var, 0} | pipes] = Macro.unpipe(setup)
     setup = expand_setup(context_var, pipes)
     _verify = expand_verify(verify)
