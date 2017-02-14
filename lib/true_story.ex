@@ -20,11 +20,12 @@ defmodule TrueStory do
     # NOTE: This is a hack!
     Module.eval_quoted(__CALLER__.module, block, [], __CALLER__)
 
+    Module.put_attribute __CALLER__.module, :true_story_integration,  false
+
     quote do
       test unquote(name), unquote(context_var) do
         unquote(build_integration_test(context_var, __CALLER__.module))
       end
-      @true_story_integration false
     end
   end
 
@@ -53,7 +54,6 @@ defmodule TrueStory do
     existing_functions = Module.get_attribute(integration_test_module, :true_story_functions)
     Module.put_attribute integration_test_module, :true_story_functions, [test_function_name|existing_functions]
 
-
     quote do
       def unquote(test_function_name)( context ) do
         try do
@@ -74,7 +74,7 @@ defmodule TrueStory do
 
   end
 
-  defp _story(false, name, setup, verify, block, _) do
+  defp _story(_, name, setup, verify, block, _) do
     [{context_var, 0} | pipes] = Macro.unpipe(setup)
     setup = expand_setup(context_var, pipes)
     _verify = expand_verify(verify)
@@ -102,7 +102,6 @@ defmodule TrueStory do
   def create_name(text, integration_test_module) do
     String.to_atom("#{Module.get_attribute(integration_test_module, :integration_test_name)} #{text}")
   end
-
 
   defp expand_setup(context_var, pipes) do
     acc = quote do: unquote(context_var) = context

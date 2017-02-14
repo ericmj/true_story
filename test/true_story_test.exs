@@ -45,20 +45,21 @@ defmodule TrueStoryTest do
     end
   end
 
+  # FAILURES
   # story "single multi error", c
   #   |> add_to_map(:key, :value),
   # verify do
   #   refute c.key == :value
   #   refute c.key == :not_value
   # end
-
+  #
   # story "two multi errors", c
   #   |> add_to_map(:key, :value),
   # verify do
   #   refute c.key == :value
   #   assert c.key == :not_value
   # end
-
+  #
   # story "multi error with failure", c
   #   |> add_to_map(:key, :value),
   # verify do
