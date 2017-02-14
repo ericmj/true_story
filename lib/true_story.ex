@@ -2,7 +2,7 @@ defmodule TrueStory do
 
   defmacro __using__(_opts) do
     quote do
-      import unquote(__MODULE__), only: [story: 4, assign: 2, integration: 2]
+      import unquote(__MODULE__), only: [story: 2, story: 4, assign: 2, integration: 2]
       import ExUnit.Assertions, except: [assert: 1, assert: 2, refute: 1, refute: 2]
       import TrueStory.Assertions
       @true_story_integration false
@@ -36,6 +36,12 @@ defmodule TrueStory do
         unquote(ast) |> unquote(name)()
       end
     end)
+  end
+
+  defmacro story(name, block) do
+    quote do
+      story(unquote(name), _c, verify, unquote(block))
+    end
   end
 
   defmacro story(name, setup, verify, block) do
@@ -114,7 +120,7 @@ defmodule TrueStory do
     end)
   end
 
-  defp expand_verify({:verify, _, nil}), do: nil
+  defp expand_verify({:verify, _, context}) when is_atom(context), do: nil
 
   defp expand_block([do: block]), do: block
 
